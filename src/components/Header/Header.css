@@ -236,6 +236,7 @@
         padding: 12px 15px;
         gap: 12px;
         flex-wrap: nowrap;
+        height: 90px;
     }
 
     .logo-img {
@@ -243,24 +244,22 @@
     }
 
     .header-center {
-        position: relative;
-        transform: none;
-        width: auto;
-        order: 0;
-        margin: 0;
-        flex: 1;
-        display: flex;
-        justify-content: center;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 50%;
+        margin-top: 5px;
+        z-index: 3;
     }
 
     .header-left {
-        order: 0;
         gap: 8px;
+        z-index: 5;
     }
 
     .header-right {
-        order: 0;
         gap: 8px;
+        z-index: 5;
     }
 
     .desktop-nav {
@@ -301,6 +300,7 @@
     .nav-container {
         padding: 10px 12px;
         gap: 8px;
+        height: 80px;
     }
 
     .logo-img {
@@ -327,6 +327,6 @@
     }
 
     .header-center {
-        flex: 0 1 auto;
+        margin-top: 0;
     }
 }
