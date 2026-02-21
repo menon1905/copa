@@ -28,7 +28,9 @@ const CheckoutPage = () => {
             customer: formData,
             items: items,
             total: totalPrice,
-        };
+};
+
+export default CheckoutPage;
 
         const order = await internalDB.saveOrder(orderData);
         setOrderId(order.id);
