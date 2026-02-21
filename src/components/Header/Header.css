@@ -216,6 +216,10 @@
     .nav-links {
         gap: 20px;
     }
+
+    .icon-btn {
+        padding: 8px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -274,10 +278,32 @@
 
     .nav-container {
         min-height: 80px;
+        padding: 5px 10px 15px 10px;
+    }
+
+    .header-left,
+    .header-right {
+        gap: 8px;
     }
 
     .top-banner {
         font-size: 11px;
         padding: 8px 0;
+    }
+
+    .icon-btn {
+        padding: 8px;
+    }
+
+    .user-email-header {
+        display: none;
+    }
+
+    .marquee-banner {
+        height: 40px;
+    }
+
+    .marquee-content {
+        font-size: 12px;
     }
 }
