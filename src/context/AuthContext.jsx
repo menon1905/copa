@@ -1,110 +1,39 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { internalDB } from '../lib/internal-db';
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Check if user is already logged in
-        const checkUser = async () => {
-            try {
-                if (!supabase) {
-                    console.log('[v0] Supabase client not available, skipping user check');
-                    setLoading(false);
-                    return;
-                }
-                const { data: { user: authUser } } = await supabase.auth.getUser();
-                setUser(authUser);
-            } catch (err) {
-                console.error('[v0] Error checking user:', err);
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        checkUser();
-
-        // Listen for auth changes
-        if (supabase) {
-            const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-                setUser(session?.user || null);
-            });
-
-            return () => subscription?.unsubscribe();
-        }
+        // Verifica se há um usuário logado no banco interno ao carregar a página
+        const current = internalDB.getUser();
+        setUser(current);
+        setLoading(false);
     }, []);
 
     const login = async (email, password) => {
-        setError(null);
-        if (!supabase) {
-            const errorMsg = 'Supabase not configured. Please check your .env file.';
-            setError(errorMsg);
-            throw new Error(errorMsg);
-        }
-        try {
-            const { data, error: loginError } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            });
-            if (loginError) throw loginError;
-            setUser(data.user);
-            return data.user;
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        }
+        const { user } = await internalDB.login(email, password);
+        setUser(user);
+        return user;
     };
 
     const signup = async (email, password) => {
-        setError(null);
-        if (!supabase) {
-            const errorMsg = 'Supabase not configured. Please check your .env file.';
-            setError(errorMsg);
-            throw new Error(errorMsg);
-        }
-        try {
-            const { data, error: signupError } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        display_name: email.split('@')[0]
-                    }
-                }
-            });
-            if (signupError) throw signupError;
-            setUser(data.user);
-            return data.user;
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        }
+        const { user } = await internalDB.signup(email, password);
+        setUser(user);
+        return user;
     };
 
     const signOut = async () => {
-        setError(null);
-        if (!supabase) {
-            throw new Error('Supabase not configured');
-        }
-        try {
-            const { error: signOutError } = await supabase.auth.signOut();
-            if (signOutError) throw signOutError;
-            setUser(null);
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        }
+        await internalDB.logout();
+        setUser(null);
     };
 
     const value = {
         user,
         loading,
-        error,
         login,
         signup,
         signOut,
