@@ -29,18 +29,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 0 15px 0;
+    padding: 10px 0 15px 0;
     position: relative;
-    /* Base for absolute logo */
-    min-height: 120px;
+    min-height: 110px;
+    gap: 15px;
 }
 
 .header-center {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-60%);
+    flex: 1;
     display: flex;
     justify-content: center;
     z-index: 10;
@@ -50,11 +46,11 @@
     margin: 0;
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
 .logo-img {
-    height: 130px;
-    /* Bolder size */
+    height: 110px;
     width: auto;
     object-fit: contain;
     display: block;
@@ -65,8 +61,7 @@
     display: flex;
     gap: 20px;
     z-index: 5;
-    flex: 1;
-    /* Keep sides flexible but they won't push the absolute center */
+    align-items: center;
 }
 
 .header-right {
@@ -195,61 +190,62 @@
 }
 
 .mobile-menu-btn {
-    display: none;
+    display: none !important;
 }
 
-@media (max-width: 968px) {
+@media (max-width: 1024px) {
     .nav-container {
         min-height: 90px;
-        padding: 5px 15px;
+        padding: 8px 15px;
     }
 
     .logo-img {
-        height: 100px;
+        height: 90px;
     }
 
     .header-left,
     .header-right {
-        gap: 10px;
+        gap: 12px;
     }
 
     .nav-links {
-        gap: 20px;
-    }
-
-    .icon-btn {
-        padding: 8px;
+        gap: 25px;
     }
 }
 
 @media (max-width: 768px) {
     .mobile-menu-btn {
-        display: flex;
+        display: flex !important;
     }
 
     .search-btn {
         display: none;
-        /* Hide search on very small to simplify */
+    }
+
+    .nav-container {
+        min-height: 80px;
+        padding: 8px 12px;
     }
 
     .logo-img {
-        height: 85px;
+        height: 70px;
     }
 
     .desktop-nav {
         position: fixed;
         top: 0;
         left: -100%;
-        width: 80%;
+        width: 75%;
+        max-width: 300px;
         height: 100vh;
         background: var(--white);
         z-index: 1000;
         transition: left 0.3s ease;
         flex-direction: column;
         justify-content: flex-start;
-        padding: 80px 40px;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
-        display: flex;
+        padding: 80px 30px;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+        overflow-y: auto;
     }
 
     .desktop-nav.mobile-open {
@@ -259,40 +255,42 @@
     .nav-links {
         flex-direction: column;
         align-items: flex-start;
-        gap: 25px;
+        gap: 18px;
     }
 
     .nav-links li a {
-        font-size: 20px;
-    }
-
-    .header-center {
-        transform: translateY(-50%);
+        font-size: 16px;
     }
 }
 
 @media (max-width: 480px) {
-    .logo-img {
-        height: 70px;
+    .mobile-menu-btn {
+        display: flex !important;
     }
 
     .nav-container {
-        min-height: 80px;
-        padding: 5px 10px 15px 10px;
+        min-height: 70px;
+        padding: 6px 10px;
+        gap: 10px;
+    }
+
+    .logo-img {
+        height: 60px;
     }
 
     .header-left,
     .header-right {
-        gap: 8px;
-    }
-
-    .top-banner {
-        font-size: 11px;
-        padding: 8px 0;
+        gap: 6px;
     }
 
     .icon-btn {
-        padding: 8px;
+        padding: 6px;
+    }
+
+    .top-banner {
+        font-size: 10px;
+        padding: 6px 0;
+        gap: 8px;
     }
 
     .user-email-header {
@@ -300,10 +298,20 @@
     }
 
     .marquee-banner {
-        height: 40px;
+        height: 35px;
     }
 
     .marquee-content {
-        font-size: 12px;
+        font-size: 11px;
+    }
+
+    .desktop-nav {
+        width: 80%;
+        max-width: 280px;
+        padding: 70px 20px;
+    }
+
+    .nav-links li a {
+        font-size: 15px;
     }
 }
