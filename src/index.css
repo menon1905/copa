@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --primary: #004d3d;
+  --primary-light: #00ff88;
+  --secondary: #f4f4f4;
+  --accent: #ff0055;
+  --black: #000000;
+  --white: #ffffff;
+  --text-dark: #1a1a1a;
+  --text-muted: #666666;
+  --bg-faint: #fafafa;
+
+  --header-height: 120px;
+  --marquee-height: 40px;
+
+  --font-main: 'Montserrat', sans-serif;
+  --font-heading: 'Montserrat', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--white);
+  color: var(--text-dark);
+  font-size: 16px;
+  /* Reduced from 18px */
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Base styles for buttons and interactive elements */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, #002d24 100%);
+}
+
+.neon-glow {
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+}
+
+.app {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+}
+
+.floating-badges {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.badge {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  padding: 20px 12px;
+  font-size: 14px;
+  /* Increased from 11px */
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 4px 0 0 4px;
+}
+
+.review-badge {
+  background: var(--black);
+  color: #fbbf24;
+}
+
+.discount-badge {
+  background: var(--white);
+  color: var(--black);
+  border: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+  .floating-badges {
+    display: none;
+  }
+
+  .container {
+    padding: 0 15px;
+  }
+
+  .breadcrumb {
+    padding: 15px 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    scrollbar-width: none;
+    background: var(--bg-faint);
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .breadcrumb::-webkit-scrollbar {
+    display: none;
+  }
+
+  .breadcrumb span {
+    flex-shrink: 0;
+  }
+}
+
+/* Breadcrumb global styles */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0;
+  font-size: 14px;
+}
+
+.breadcrumb a {
+  color: var(--text-muted);
+}
+
+.breadcrumb span {
+  color: #ccc;
+}
+
+.breadcrumb .current {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
+}
