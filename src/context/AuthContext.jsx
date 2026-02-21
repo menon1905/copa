@@ -13,14 +13,14 @@ export const AuthProvider = ({ children }) => {
         const checkUser = async () => {
             try {
                 if (!supabase) {
-                    console.warn('Supabase not configured');
+                    console.log('[v0] Supabase client not available, skipping user check');
                     setLoading(false);
                     return;
                 }
                 const { data: { user: authUser } } = await supabase.auth.getUser();
                 setUser(authUser);
             } catch (err) {
-                console.error('Error checking user:', err);
+                console.error('[v0] Error checking user:', err);
                 setError(err.message);
             } finally {
                 setLoading(false);
@@ -42,8 +42,9 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         setError(null);
         if (!supabase) {
-            setError('Supabase not configured');
-            throw new Error('Supabase not configured');
+            const errorMsg = 'Supabase not configured. Please check your .env file.';
+            setError(errorMsg);
+            throw new Error(errorMsg);
         }
         try {
             const { data, error: loginError } = await supabase.auth.signInWithPassword({
@@ -62,8 +63,9 @@ export const AuthProvider = ({ children }) => {
     const signup = async (email, password) => {
         setError(null);
         if (!supabase) {
-            setError('Supabase not configured');
-            throw new Error('Supabase not configured');
+            const errorMsg = 'Supabase not configured. Please check your .env file.';
+            setError(errorMsg);
+            throw new Error(errorMsg);
         }
         try {
             const { data, error: signupError } = await supabase.auth.signUp({
