@@ -45,16 +45,7 @@ const handleAuth = async (e) => {
             }
         } catch (error) {
             setIsError(true);
-            // Handle specific Supabase errors
-            if (error.message?.includes('Invalid login credentials')) {
-                setMessage('Email ou senha incorretos');
-            } else if (error.message?.includes('User already registered')) {
-                setMessage('Este email já está registrado');
-            } else if (error.message?.includes('Password should be at least 6 characters')) {
-                setMessage('A senha deve ter pelo menos 6 caracteres');
-            } else {
-                setMessage(error.message || 'Erro ao processar. Tente novamente.');
-            }
+            setMessage(error.message || 'Erro ao processar. Tente novamente.');
         } finally {
             setLoading(false);
         }
