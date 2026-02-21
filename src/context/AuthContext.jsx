@@ -1,39 +1,90 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { internalDB } from '../lib/internal-db';
+import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Verifica se há um usuário logado no banco interno ao carregar a página
-        const current = internalDB.getUser();
-        setUser(current);
-        setLoading(false);
+        // Check if user is already logged in
+        const checkUser = async () => {
+            try {
+                const { data: { user: authUser } } = await supabase.auth.getUser();
+                setUser(authUser);
+            } catch (err) {
+                console.error('Error checking user:', err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkUser();
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            setUser(session?.user || null);
+        });
+
+        return () => subscription?.unsubscribe();
     }, []);
 
     const login = async (email, password) => {
-        const { user } = await internalDB.login(email, password);
-        setUser(user);
-        return user;
+        setError(null);
+        try {
+            const { data, error: loginError } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+            if (loginError) throw loginError;
+            setUser(data.user);
+            return data.user;
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        }
     };
 
     const signup = async (email, password) => {
-        const { user } = await internalDB.signup(email, password);
-        setUser(user);
-        return user;
+        setError(null);
+        try {
+            const { data, error: signupError } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        display_name: email.split('@')[0]
+                    }
+                }
+            });
+            if (signupError) throw signupError;
+            setUser(data.user);
+            return data.user;
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        }
     };
 
     const signOut = async () => {
-        await internalDB.logout();
-        setUser(null);
+        setError(null);
+        try {
+            const { error: signOutError } = await supabase.auth.signOut();
+            if (signOutError) throw signOutError;
+            setUser(null);
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        }
     };
 
     const value = {
         user,
         loading,
+        error,
         login,
         signup,
         signOut,

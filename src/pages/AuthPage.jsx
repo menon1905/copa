@@ -13,8 +13,22 @@ const AuthPage = () => {
     const [isError, setIsError] = useState(false);
     const navigate = useNavigate();
 
-    const handleAuth = async (e) => {
+const handleAuth = async (e) => {
         e.preventDefault();
+        
+        // Validate input
+        if (!email || !password) {
+            setIsError(true);
+            setMessage('Por favor, preencha todos os campos');
+            return;
+        }
+
+        if (password.length < 6) {
+            setIsError(true);
+            setMessage('A senha deve ter pelo menos 6 caracteres');
+            return;
+        }
+
         setLoading(true);
         setMessage('');
         setIsError(false);
@@ -26,11 +40,21 @@ const AuthPage = () => {
                 setTimeout(() => navigate('/'), 1500);
             } else {
                 await login(email, password);
-                navigate('/');
+                setMessage('Login bem-sucedido! Redirecionando...');
+                setTimeout(() => navigate('/'), 1000);
             }
         } catch (error) {
             setIsError(true);
-            setMessage(error.message);
+            // Handle specific Supabase errors
+            if (error.message?.includes('Invalid login credentials')) {
+                setMessage('Email ou senha incorretos');
+            } else if (error.message?.includes('User already registered')) {
+                setMessage('Este email já está registrado');
+            } else if (error.message?.includes('Password should be at least 6 characters')) {
+                setMessage('A senha deve ter pelo menos 6 caracteres');
+            } else {
+                setMessage(error.message || 'Erro ao processar. Tente novamente.');
+            }
         } finally {
             setLoading(false);
         }

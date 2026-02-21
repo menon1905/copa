@@ -1,24 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CreditCard, Truck, ShieldCheck, ArrowLeft, Check } from 'lucide-react';
+import { CreditCard, Truck, ShieldCheck, ArrowLeft, Check, Trash2, Plus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { usePayment } from '../context/PaymentContext';
 import { formatPrice } from '../data/products';
 import { internalDB } from '../lib/internal-db';
 import './CheckoutPage.css';
 
 const CheckoutPage = () => {
     const { items, totalPrice, clearCart } = useCart();
+    const { user } = useAuth();
+    const { cards, fetchCards, saveCard, deleteCard } = usePayment();
     const navigate = useNavigate();
     const [submitted, setSubmitted] = useState(false);
     const [orderId, setOrderId] = useState('');
+    const [showNewCardForm, setShowNewCardForm] = useState(false);
+    const [cardFormData, setCardFormData] = useState({
+        cardNumber: '', cardHolder: '', expiryMonth: '', expiryYear: '', cvv: ''
+    });
     const [formData, setFormData] = useState({
         name: '', email: '', phone: '', cpf: '',
         cep: '', address: '', number: '', complement: '', city: '', state: '',
         paymentMethod: 'credit',
+        selectedCard: null
     });
+
+    // Load saved cards when component mounts or user changes
+    useEffect(() => {
+        if (user?.id) {
+            fetchCards(user.id);
+        }
+    }, [user?.id, fetchCards]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleCardFormChange = (e) => {
+        setCardFormData({ ...cardFormData, [e.target.name]: e.target.value });
+    };
+
+    const handleSaveNewCard = async (e) => {
+        e.preventDefault();
+        if (!user?.id) {
+            alert('Você precisa estar logado para salvar um cartão');
+            return;
+        }
+
+        try {
+            await saveCard(user.id, cardFormData);
+            setCardFormData({ cardNumber: '', cardHolder: '', expiryMonth: '', expiryYear: '', cvv: '' });
+            setShowNewCardForm(false);
+            setFormData({ ...formData, selectedCard: cards[0]?.id });
+        } catch (error) {
+            alert('Erro ao salvar cartão: ' + error.message);
+        }
+    };
+
+    const handleDeleteCard = async (cardId) => {
+        if (!user?.id) return;
+        try {
+            await deleteCard(cardId, user.id);
+        } catch (error) {
+            alert('Erro ao deletar cartão: ' + error.message);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -28,6 +74,7 @@ const CheckoutPage = () => {
             customer: formData,
             items: items,
             total: totalPrice,
+            userId: user?.id || null
         };
 
         const order = await internalDB.saveOrder(orderData);
@@ -166,6 +213,118 @@ const CheckoutPage = () => {
                                     </div>
                                 </label>
                             </div>
+
+                            {/* Saved Cards Section - Only show for credit card payment */}
+                            {formData.paymentMethod === 'credit' && (
+                                <div className="saved-cards-section">
+                                    <h4>Seus Cartões Salvos</h4>
+                                    
+                                    {cards && cards.length > 0 ? (
+                                        <div className="cards-list">
+                                            {cards.map(card => (
+                                                <div key={card.id} className="saved-card-item">
+                                                    <label>
+                                                        <input 
+                                                            type="radio" 
+                                                            name="selectedCard"
+                                                            value={card.id}
+                                                            checked={formData.selectedCard === card.id}
+                                                            onChange={(e) => setFormData({ ...formData, selectedCard: e.target.value })}
+                                                        />
+                                                        <div className="card-info">
+                                                            <span className="card-number">{card.masked_number}</span>
+                                                            <span className="card-holder">{card.card_holder}</span>
+                                                            <span className="card-expiry">{card.expiry_month}/{card.expiry_year}</span>
+                                                        </div>
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        className="delete-card-btn"
+                                                        onClick={() => handleDeleteCard(card.id)}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="no-cards-message">Nenhum cartão salvo</p>
+                                    )}
+
+                                    {/* New Card Form */}
+                                    <button
+                                        type="button"
+                                        className="add-new-card-btn"
+                                        onClick={() => setShowNewCardForm(!showNewCardForm)}
+                                    >
+                                        <Plus size={16} /> Adicionar novo cartão
+                                    </button>
+
+                                    {showNewCardForm && (
+                                        <form className="new-card-form" onSubmit={handleSaveNewCard}>
+                                            <div className="form-field">
+                                                <label>Número do Cartão *</label>
+                                                <input
+                                                    type="text"
+                                                    name="cardNumber"
+                                                    value={cardFormData.cardNumber}
+                                                    onChange={handleCardFormChange}
+                                                    placeholder="0000 0000 0000 0000"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="form-field full">
+                                                <label>Nome do Titular *</label>
+                                                <input
+                                                    type="text"
+                                                    name="cardHolder"
+                                                    value={cardFormData.cardHolder}
+                                                    onChange={handleCardFormChange}
+                                                    placeholder="Nome completo"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="form-field">
+                                                <label>Mês *</label>
+                                                <input
+                                                    type="text"
+                                                    name="expiryMonth"
+                                                    value={cardFormData.expiryMonth}
+                                                    onChange={handleCardFormChange}
+                                                    placeholder="MM"
+                                                    maxLength="2"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="form-field">
+                                                <label>Ano *</label>
+                                                <input
+                                                    type="text"
+                                                    name="expiryYear"
+                                                    value={cardFormData.expiryYear}
+                                                    onChange={handleCardFormChange}
+                                                    placeholder="YYYY"
+                                                    maxLength="4"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="form-field">
+                                                <label>CVV *</label>
+                                                <input
+                                                    type="text"
+                                                    name="cvv"
+                                                    value={cardFormData.cvv}
+                                                    onChange={handleCardFormChange}
+                                                    placeholder="000"
+                                                    maxLength="3"
+                                                    required
+                                                />
+                                            </div>
+                                            <button type="submit" className="save-card-btn">Salvar Cartão</button>
+                                        </form>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
 
