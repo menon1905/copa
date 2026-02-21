@@ -9,9 +9,14 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         // Verifica se há um usuário logado no banco interno ao carregar a página
-        const current = internalDB.getUser();
-        setUser(current);
-        setLoading(false);
+        try {
+            const current = internalDB.getUser();
+            setUser(current);
+        } catch (error) {
+            console.error('[v0] Error getting user:', error);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
     const login = async (email, password) => {
@@ -41,7 +46,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };
