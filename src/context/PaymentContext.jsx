@@ -10,7 +10,7 @@ export const PaymentProvider = ({ children }) => {
 
   // Fetch saved cards for the current user
   const fetchCards = async (userId) => {
-    if (!userId) {
+    if (!userId || !supabase) {
       setCards([]);
       return;
     }
@@ -44,8 +44,8 @@ export const PaymentProvider = ({ children }) => {
 
   // Save a new card
   const saveCard = async (userId, cardData) => {
-    if (!userId) {
-      setError('User not logged in');
+    if (!userId || !supabase) {
+      setError('User not logged in or Supabase not configured');
       return null;
     }
 
@@ -84,6 +84,11 @@ export const PaymentProvider = ({ children }) => {
 
   // Delete a card
   const deleteCard = async (cardId, userId) => {
+    if (!supabase) {
+      setError('Supabase not configured');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -108,6 +113,11 @@ export const PaymentProvider = ({ children }) => {
 
   // Set card as default
   const setDefaultCard = async (cardId, userId) => {
+    if (!supabase) {
+      setError('Supabase not configured');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 

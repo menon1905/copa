@@ -12,6 +12,11 @@ export const AuthProvider = ({ children }) => {
         // Check if user is already logged in
         const checkUser = async () => {
             try {
+                if (!supabase) {
+                    console.warn('Supabase not configured');
+                    setLoading(false);
+                    return;
+                }
                 const { data: { user: authUser } } = await supabase.auth.getUser();
                 setUser(authUser);
             } catch (err) {
@@ -25,15 +30,21 @@ export const AuthProvider = ({ children }) => {
         checkUser();
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            setUser(session?.user || null);
-        });
+        if (supabase) {
+            const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+                setUser(session?.user || null);
+            });
 
-        return () => subscription?.unsubscribe();
+            return () => subscription?.unsubscribe();
+        }
     }, []);
 
     const login = async (email, password) => {
         setError(null);
+        if (!supabase) {
+            setError('Supabase not configured');
+            throw new Error('Supabase not configured');
+        }
         try {
             const { data, error: loginError } = await supabase.auth.signInWithPassword({
                 email,
@@ -50,6 +61,10 @@ export const AuthProvider = ({ children }) => {
 
     const signup = async (email, password) => {
         setError(null);
+        if (!supabase) {
+            setError('Supabase not configured');
+            throw new Error('Supabase not configured');
+        }
         try {
             const { data, error: signupError } = await supabase.auth.signUp({
                 email,
@@ -71,6 +86,9 @@ export const AuthProvider = ({ children }) => {
 
     const signOut = async () => {
         setError(null);
+        if (!supabase) {
+            throw new Error('Supabase not configured');
+        }
         try {
             const { error: signOutError } = await supabase.auth.signOut();
             if (signOutError) throw signOutError;
