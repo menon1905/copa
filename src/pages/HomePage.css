@@ -4,7 +4,7 @@
 
 /* Featured Section */
 .featured-section {
-    padding: 60px 0;
+    padding: 100px 0;
 }
 
 .featured-header {
@@ -34,7 +34,7 @@
 .featured-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    gap: 32px;
 }
 
 .featured-card {
@@ -119,7 +119,7 @@
 
 /* Categories Showcase */
 .categories-showcase {
-    padding: 50px 0 60px;
+    padding: 80px 0 100px;
 }
 
 .categories-showcase h2 {
@@ -174,7 +174,7 @@
 .trust-strip-inner {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    gap: 40px;
 }
 
 .trust-strip-item {
